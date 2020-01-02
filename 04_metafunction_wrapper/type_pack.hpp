@@ -75,9 +75,9 @@ constexpr auto find_if(type_pack<Ts...> pack, F f) {
     return i;
 }
 
-template <class F, class...Ts>
-constexpr auto all_of(type_pack<Ts...> pack, F f) {
-    return (f(type_identity<Ts>{}) and ...);
+template <class F, class...Ts, class...Args>
+constexpr auto all_of(type_pack<Ts...> pack, F f, Args...args) {
+    return (f(type_identity<Ts>{}, type_identity<Args>{}...) and ...);
 }
 
 template <class F, class...Ts>
@@ -124,6 +124,9 @@ namespace type_pack_test {
     static_assert(all_of(pack, value_fn<std::is_integral>{}));
     static_assert(not all_of(type_pack<int, int*>{}, value_fn<std::is_integral>{}));
     static_assert(all_of(type_pack<B, C>{}, value_fn<std::is_base_of, A>{}));
+    static_assert(not all_of(type_pack<B, C, D>{}, value_fn<std::is_base_of, A>{}));
+    static_assert(all_of(type_pack<A, B>{}, value_first_fn<std::is_base_of, C>{}));
+    static_assert(not all_of(type_pack<A, B, D>{}, value_first_fn<std::is_base_of, C>{}));
 
     static_assert(not any_of(pack, value_fn<std::is_pointer>{}));
     static_assert(any_of(type_pack<int, int*>{}, value_fn<std::is_pointer>{}));
