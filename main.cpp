@@ -9,4 +9,9 @@ int main() {
         int_count += std::is_same_v<v_type, int>;
     });
     std::cout << int_count << std::endl;
+
+    auto is_int = to_array(pack, value_fn<std::is_same, int>{});
+    for (auto v : is_int)
+        std::cout << v << " ";
+     std::cout << std::endl;
 }

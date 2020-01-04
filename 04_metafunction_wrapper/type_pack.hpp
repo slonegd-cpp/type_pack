@@ -3,6 +3,7 @@
 #include "type_identity.hpp"
 #include "metafn_wrapper.hpp"
 #include <type_traits>
+#include <array>
 
 template <class...Ts>
 struct type_pack{};
@@ -111,6 +112,11 @@ constexpr auto filter(type_pack<Ts...> pack, F f) {
             return empty_pack{};
     };
     return (empty_pack{} + ... + filter_one(type_identity<Ts>{}, f));
+}
+
+template <class F, class...Ts>
+constexpr auto to_array(type_pack<Ts...> pack, F f) {
+    return std::array{f(type_identity<Ts>{})...};
 }
 
 
