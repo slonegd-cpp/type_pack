@@ -90,6 +90,12 @@ constexpr auto none_of(type_pack<Ts...> pack, F f) {
     return not any_of(pack, f);
 }
 
+template <class F, class...Ts>
+constexpr void foreach(type_pack<Ts...> pack, F f) {
+    auto i{0};
+    (f(i++, type_identity<Ts>{}), ...);
+}
+
 
 
 namespace type_pack_test {
