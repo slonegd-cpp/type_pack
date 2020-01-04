@@ -40,6 +40,11 @@ constexpr auto operator!= (type_pack<Ts...>, type_pack<Us...>) { return true; }
 template <class...Ts>
 constexpr auto operator!= (type_pack<Ts...>, type_pack<Ts...>) { return false; }
 
+template <class...Ts, class...Us>
+constexpr auto operator+ (type_pack<Ts...>, type_pack<Us...>) { 
+    return type_pack<Ts..., Us...>{}; 
+}
+
 // dont need, just example
 template <class T, class...Ts>
 constexpr auto push_front(type_pack<Ts...>, type_identity<T>) { return type_pack<T, Ts...>{}; }
@@ -96,6 +101,18 @@ constexpr void foreach(type_pack<Ts...> pack, F f) {
     (f(i++, type_identity<Ts>{}), ...);
 }
 
+template <class F, class...Ts>
+constexpr auto filter(type_pack<Ts...> pack, F f) {
+    auto filter_one = [](auto v, auto f) {
+        using T = typename decltype(v)::type;
+        if constexpr (f(v))
+            return type_pack<T>{};
+        else
+            return empty_pack{};
+    };
+    return (empty_pack{} + ... + filter_one(type_identity<Ts>{}, f));
+}
+
 
 
 namespace type_pack_test {
@@ -146,4 +163,6 @@ namespace type_pack_test {
 
     static_assert(none_of(pack, value_fn<std::is_pointer>{}));
     static_assert(not none_of(type_pack<int, int*>{}, value_fn<std::is_pointer>{}));
+
+    static_assert(filter(type_pack<int, int*, bool*>{}, value_fn<std::is_pointer>{}) == type_pack<int*, bool*>{});
 }
