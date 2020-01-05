@@ -6,16 +6,12 @@
 #include <array>
 
 template <class...Ts>
-struct type_pack{
-    template <class...Us>
-    constexpr type_pack(Us...) {};
-};
+struct type_pack{};
 
-template<class...Ts>
-type_pack() -> type_pack<Ts...>;
-
-template<class...Ts>
-type_pack(type_identity<Ts>...) -> type_pack<Ts...>;
+template <class...Ts>
+constexpr auto make_type_pack(type_identity<Ts>...) {
+    return type_pack<Ts...>{};
+}
 
 using empty_pack = type_pack<>;
 
@@ -131,16 +127,13 @@ namespace type_pack_test {
     struct C : B {};
     struct D {};
     constexpr auto pack = type_pack<int, bool, char>{};
-    constexpr auto pack_ctor = type_pack(type_identity<int>{}, type_identity<bool>{}, type_identity<char>{});
-
-    static_assert(pack == pack_ctor);
 
     static_assert(size(pack) == 3);
     static_assert(not empty(pack));
     static_assert(empty(empty_pack{}));
 
     static_assert(std::is_same_v<decltype(head(pack))::type,int>);
-    static_assert(std::is_same_v<decltype(tail(pack_ctor)), decltype(type_pack<bool,char>{})>);
+    static_assert(std::is_same_v<decltype(tail(pack)), decltype(type_pack<bool,char>{})>);
 
     static_assert(pack == type_pack<int, bool, char>{});
     static_assert(pack != type_pack<int, bool, int>{});
