@@ -6,6 +6,9 @@ struct type_identity { using type = T; };
 template <class T>
 using type_identity_t = typename type_identity<T>::type;
 
+// достать тип из значения типа, пока не придумал ничего лучше макроса
+#define TYPE(v) typename decltype(v)::type
+
 template <class T, class U>
 constexpr auto operator== (type_identity<T>, type_identity<U>) { return false; }
 
